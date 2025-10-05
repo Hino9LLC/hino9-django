@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Tags - News Articles{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{% url 'news:list' %}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+        </svg>
+        <span>Back to News List</span>
+    </a>
+</div>
+
+<div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-8">
+    <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 tag-background rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-accent-primary" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+            </svg>
+        </div>
+        <div>
+            <h1 class="text-2xl font-bold text-heading">Browse Tags</h1>
+        </div>
+    </div>
+
+    <nav class="text-sm text-meta">
+        <a href="{% url 'news:list' %}" class="hover:text-accent-primary">News</a>
+        <span class="mx-2">/</span>
+        <span class="text-heading font-medium">Tags</span>
+    </nav>
+</div>
+
+{% if tags %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for tag_data in tags %}
+            <a href="{% url 'news:tag_detail' tag_data.tag.slug %}?from=tags" class="group block">
+                <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 transition-all duration-300 hover:bg-slate-700/50 hover:shadow-xl h-full">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-heading group-hover:text-accent-primary transition-colors duration-200 mb-2">
+                                {{ tag_data.tag.name }}
+                            </h3>
+                            <div class="flex items-center gap-4 text-sm text-meta">
+                                <span>{{ tag_data.article_count }} article{{ tag_data.article_count|pluralize }}</span>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <svg class="w-5 h-5 text-meta group-hover:text-accent-primary transition-colors duration-200" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50 text-center">
+        <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-meta" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+            </svg>
+        </div>
+        <h3 class="text-xl font-bold text-heading mb-2">No Tags Found</h3>
+        <p class="text-meta mb-6">Tags haven't been set up yet.</p>
+        <a href="{% url 'news:list' %}" class="inline-flex items-center gap-2 btn-primary">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Browse All Articles</span>
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

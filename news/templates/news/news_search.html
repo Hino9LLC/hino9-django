@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search News{% endblock %}
+
+{% block meta_description %}Search HINO9's AI-powered news articles using vector similarity, text search, or hybrid search. Find the latest AI news and insights.{% endblock %}
+
+{% block content %}
+    <div class="mb-6">
+        <a href="{% url 'news:list' %}" class="inline-flex items-center gap-2 text-primary-400 hover:text-primary-300 font-medium transition-colors duration-200">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Back to News List</span>
+        </a>
+    </div>
+
+    <!-- Search Form Card -->
+    <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 mb-8 border border-slate-700/50 transition-all duration-300 hover:shadow-xl">
+        <h2 class="text-2xl font-bold text-slate-200 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-accent-primary" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+            </svg>
+            Search News Articles
+        </h2>
+        
+        <form method="get" class="space-y-6">
+            <div>
+                <label for="search-input" class="hidden md:block text-sm font-medium text-slate-300 mb-2">Search Query</label>
+                <input
+                    type="text"
+                    id="search-input"
+                    name="q"
+                    value="{{ query }}"
+                    placeholder="Enter keywords to search articles..."
+                    required
+                    class="w-full px-4 py-3 border border-slate-600 rounded-lg bg-slate-700 text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                >
+            </div>
+
+            <!-- Hidden input for mobile - always use hybrid search -->
+            <input type="hidden" name="type" value="hybrid" class="block md:hidden">
+
+            <!-- Search Type Selection - Desktop only -->
+            <div class="hidden md:block">
+                <label class="block text-sm font-medium text-slate-300 mb-3">Search Type</label>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <label class="relative flex items-center p-4 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors duration-200">
+                        <input type="radio" name="type" value="hybrid" {% if search_type == "hybrid" %}checked{% endif %} class="sr-only">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 border-2 border-slate-600 rounded-full mr-3 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-primary-600 rounded-full opacity-0 transition-opacity duration-200"></div>
+                            </div>
+                            <div>
+                                <div class="font-medium text-slate-100">Hybrid</div>
+                                <div class="text-sm text-slate-400">Vector + Text</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors duration-200">
+                        <input type="radio" name="type" value="vector" {% if search_type == "vector" %}checked{% endif %} class="sr-only">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 border-2 border-slate-600 rounded-full mr-3 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-primary-600 rounded-full opacity-0 transition-opacity duration-200"></div>
+                            </div>
+                            <div>
+                                <div class="font-medium text-slate-100">Vector</div>
+                                <div class="text-sm text-slate-400">AI Similarity</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="relative flex items-center p-4 border border-slate-600 rounded-lg cursor-pointer hover:bg-slate-700/50 transition-colors duration-200">
+                        <input type="radio" name="type" value="text" {% if search_type == "text" %}checked{% endif %} class="sr-only">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 border-2 border-slate-600 rounded-full mr-3 flex items-center justify-center">
+                                <div class="w-2 h-2 bg-primary-600 rounded-full opacity-0 transition-opacity duration-200"></div>
+                            </div>
+                            <div>
+                                <div class="font-medium text-slate-100">Text</div>
+                                <div class="text-sm text-slate-400">Keyword Match</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <button
+                type="submit"
+                class="w-full md:w-auto px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 inline-flex items-center justify-center gap-2 text-base"
+            >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                </svg>
+                Search Articles
+            </button>
+        </form>
+        
+    </div>
+
+    {% if rate_limited %}
+        <!-- Rate Limit Error -->
+        <div class="bg-yellow-900/50 backdrop-blur-sm rounded-xl p-6 mb-6 border border-yellow-700/50">
+            <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <h3 class="text-lg font-bold text-yellow-200">Rate Limit Exceeded</h3>
+                    <p class="text-yellow-300">{{ error_message }}</p>
+                </div>
+            </div>
+        </div>
+    {% elif query %}
+        <!-- Search Results Header -->
+        <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 mb-6 border border-slate-700/50">
+            <h3 class="text-xl font-bold text-slate-200 mb-2">Search Results for "{{ query }}"</h3>
+            <p class="text-slate-400">Found <span class="font-semibold text-primary-400">{{ total_count }}</span> article{{ total_count|pluralize }}</p>
+        </div>
+
+        {% if news_articles %}
+            <div class="space-y-6">
+                {% for article in news_articles %}
+                    <article id="article-{{ article.id }}" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 transition-all duration-300 hover:shadow-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {% if article.image_url %}
+                                <div class="md:col-span-1 md:order-2 flex justify-end">
+                                    <div class="thumbnail-container">
+                                        <img
+                                            src="{{ article.image_url }}"
+                                            alt="{{ article.display_title }}"
+                                            class="rounded-lg"
+                                            loading="lazy"
+                                            onerror="this.style.display='none'"
+                                        >
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="md:col-span-2 md:order-1">
+                            <h3 class="text-xl font-bold mb-3">
+                                <a href="{% url 'news:detail' article.id article.slug %}?from_search=1&q={{ query }}&type={{ search_type }}&from_page={{ page_obj.number }}#article-{{ article.id }}" class="link-title">
+                                    {{ article.display_title }}
+                                </a>
+                            </h3>
+
+                            <!-- Article Meta -->
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-meta mb-4">
+                                {% if article.article_date %}
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span>{{ article.article_date|date:"M d, Y" }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if article.domain %}
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span>{{ article.site_name|default:article.domain }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if article.display_summary %}
+                                <p class="text-body mb-4 leading-relaxed">{{ article.display_summary|truncatewords:50 }}</p>
+                            {% endif %}
+
+                            <!-- Tags -->
+                            {% if article.llm_tags %}
+                                <div class="flex flex-wrap gap-2">
+                                    {% for tag in article.llm_tags|slice:":5" %}
+                                        <a href="{% url 'news:tag_detail' tag_slug=tag|slugify %}" class="tag-hover">{{ tag }}</a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50 text-center">
+                <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-200 mb-2">No Results Found</h3>
+                <p class="text-slate-400">No articles match your search query "{{ query }}". Try different keywords or search type.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if news_articles and page_obj.has_other_pages %}
+        <div style="margin-top: 3rem; margin-bottom: 3rem;" class="flex flex-col items-center space-y-4">
+            <div class="flex items-center justify-center gap-2">
+                <!-- Previous Page -->
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ query }}&type={{ search_type }}&page={{ page_obj.previous_page_number }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-accent-primary hover:text-accent-secondary transition-colors duration-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        Previous
+                    </a>
+                {% endif %}
+
+                <!-- Page Info -->
+                <div class="px-6 py-2 text-sm text-heading font-medium">
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </div>
+
+                <!-- Next Page -->
+                {% if page_obj.has_next %}
+                    <a href="?q={{ query }}&type={{ search_type }}&page={{ page_obj.next_page_number }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-accent-primary hover:text-accent-secondary transition-colors duration-200">
+                        Next
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Page Range Info -->
+            <div class="text-sm text-meta text-center">
+                Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ total_count }} articles
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Page-specific JavaScript -->
+    <script src="{% static 'js/news-search.js' %}" defer></script>
+{% endblock %}

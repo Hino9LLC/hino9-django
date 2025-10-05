@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Page Not Found - HINO9{% endblock %}
+
+{% block meta_description %}The page you're looking for doesn't exist. HINO9 - AI Powered AI News{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4">
+    <div class="max-w-md w-full text-center">
+        <div class="mb-8">
+            <!-- 404 Number -->
+            <h1 class="text-8xl font-bold text-primary-400 mb-4">404</h1>
+
+            <!-- Error Message -->
+            <h2 class="text-2xl font-semibold text-white mb-4">Page Not Found</h2>
+
+            <p class="text-slate-300 mb-8">
+                Sorry, we couldn't find the page you're looking for. The page may have been moved, deleted, or the URL might be incorrect.
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-4">
+            <a href="{% url 'news:list' %}"
+               class="inline-block w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200">
+                Go Home
+            </a>
+
+            <div class="flex space-x-4">
+                <a href="{% url 'news:list' %}"
+                   class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                    Latest News
+                </a>
+
+                <a href="{% url 'news:search' %}"
+                   class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                    Search
+                </a>
+            </div>
+        </div>
+
+        <!-- Optional: Search Form -->
+        <div class="mt-8 pt-8 border-t border-slate-700">
+            <p class="text-slate-400 text-sm mb-4">Or try searching for what you're looking for:</p>
+            <form action="{% url 'news:search' %}" method="get" class="flex space-x-2">
+                <input type="text"
+                       name="q"
+                       placeholder="Search news..."
+                       class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                <button type="submit"
+                        class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block og_title %}Page Not Found - HINO9{% endblock %}
+{% block og_description %}The page you're looking for doesn't exist. HINO9 - AI Powered AI News{% endblock %}

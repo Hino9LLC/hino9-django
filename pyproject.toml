@@ -1,0 +1,65 @@
+[project]
+name = "ainews"
+version = "0.1.0"
+description = "AI-powered news aggregation and search platform with Django"
+requires-python = ">=3.11"
+dependencies = [
+    "django",
+    "mypy",
+    "django-stubs",
+    "psycopg2-binary",
+    "python-dotenv",
+    "pgvector",
+    "botocore",
+    "requests",
+    "types-requests",
+    "tenacity",
+    "django-tailwind",
+    "django-browser-reload",
+    "cookiecutter",
+    "django-ratelimit>=4.1.0",
+    "gunicorn>=21.2.0",
+    "redis>=6.4.0",
+    "django-redis>=5.4.0",
+    "whitenoise>=6.11.0",
+    "django-prometheus>=2.4.1",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = ["E501"]  # Let black handle line length
+fixable = ["ALL"]
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["mypy_django_plugin.main"]
+disallow_untyped_defs = true
+check_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "ainews.settings"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.10.7",
+    "pytest-playwright>=0.7.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["ainews"]
+
+[tool.uv]
+index-url = "https://pypi.org/simple"

@@ -1,0 +1,70 @@
+# Version control
+.git
+.github
+.gitignore
+
+# Python
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+.eggs
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+.tox
+.mypy_cache
+.ruff_cache
+tests
+
+# IDEs
+.vscode
+.idea
+.cursor
+.claude
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.*
+!.env.docker.example
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Static files (will be collected during build)
+staticfiles
+
+# Database
+*.db
+*.sqlite3
+*.sql
+
+# Documentation
+*.md
+!README.md
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.backup

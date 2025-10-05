@@ -1,0 +1,97 @@
+# Local development environment for ainews Django application
+#
+# This docker-compose setup provides production parity for local testing:
+# - Uses Gunicorn (same as production) instead of runserver
+# - Connects to existing local PostgreSQL via host.docker.internal
+# - Runs Redis for caching and rate limiting
+# - Serves static files via WhiteNoise (same as production)
+#
+# Usage:
+#   docker compose up -d      # Start services
+#   docker compose logs -f    # View logs
+#   docker compose down       # Stop services
+#
+# For development with hot CSS reload, use: make run
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: ainews-redis
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: ainews-web
+    ports:
+      - "8300:8300"
+    volumes:
+      # Mount source code for hot reload
+      - .:/app
+      # Exclude these from mount to use container's versions
+      - /app/.venv
+      - /app/node_modules
+      - /app/theme/static_src/node_modules
+      - /app/.mypy_cache
+      - /app/.pytest_cache
+      - /app/.ruff_cache
+    environment:
+      # UV settings
+      - UV_LINK_MODE=copy
+
+      # Django settings
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=False
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+
+      # Database (connects to existing local postgres)
+      - POSTGRES_APP_DB=${POSTGRES_DB}
+      - POSTGRES_APP_USER=${POSTGRES_USER}
+      - POSTGRES_APP_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_APP_SERVICE=host.docker.internal
+      - POSTGRES_APP_PORT=${POSTGRES_PORT:-5432}
+
+      # Redis (use local redis service)
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+      # AWS credentials
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_KEY=${AWS_SECRET_KEY}
+      - AWS_LAMBDA_ACCESS_KEY=${AWS_LAMBDA_ACCESS_KEY}
+      - AWS_LAMBDA_SECRET_KEY=${AWS_LAMBDA_SECRET_KEY}
+      - AWS_EMBED_URL=${AWS_EMBED_URL}
+      - AWS_APP_RUNNER_API_KEY=${AWS_APP_RUNNER_API_KEY}
+
+      # Application settings
+      - RATELIMIT_ENABLE=${RATELIMIT_ENABLE:-True}
+      - SEARCH_RATE_LIMIT=${SEARCH_RATE_LIMIT:-100/h}
+      - WORKERS=2
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8300/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    command: sh -c "uv run python manage.py collectstatic --noinput && uv run gunicorn ainews.wsgi:application --bind 0.0.0.0:8300 --workers 2 --timeout 60 --reload --access-logfile - --error-logfile -"
+    extra_hosts:
+      # Allow container to connect to host's postgres
+      - "host.docker.internal:host-gateway"
+
+networks:
+  default:
+    name: ainews-network

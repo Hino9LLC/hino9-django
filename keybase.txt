@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/hino9
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://hino9.com
+  * I am hino9 (https://keybase.io/hino9) on keybase.
+  * I have a public key ASCWyNu2Ho1B2yeIEURbjxTZzcFQi_BWexTAIHCQMgDViAo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "012096c8dbb61e8d41db278811445b8f14d9cdc1508bf0567b14c02070903200d5880a",
+      "host": "keybase.io",
+      "kid": "012096c8dbb61e8d41db278811445b8f14d9cdc1508bf0567b14c02070903200d5880a",
+      "uid": "73a79fdf86628e12ec4a82b54a0b6619",
+      "username": "hino9"
+    },
+    "merkle_root": {
+      "ctime": 1724237865,
+      "hash": "20fc8f24498c54f531ec771d73d114b95d1a0912f88f40a6a606fc996dce3bca504034d3dee653446286f7b8070d7653fb166be15d9bc76510cfab7cbd13976f",
+      "hash_meta": "c347c89b296ca759b4899ca3f121d24756b6ed7edfb6e35224516765368e47f0",
+      "seqno": 26030204
+    },
+    "service": {
+      "entropy": "WU4PQ+9lwprSCpxYRtzr/+ys",
+      "hostname": "hino9.com",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "6.4.0"
+  },
+  "ctime": 1724237893,
+  "expire_in": 504576000,
+  "prev": "8319f7be13fbee093dece824f1e077801ba50470fe1aa0d96f63af31902f7af6",
+  "seqno": 34,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEglsjbth6NQdsniBFEW48U2c3BUIvwVnsUwCBwkDIA1YgKp3BheWxvYWTESpcCIsQggxn3vhP77gk97Ogk8eB3gBulBHD+GqDZb2OvMZAvevbEIJnwxAzeLE2t+kGzD8mrqdNsl2djPrKAcdqFl0GT0mhlAgHCo3NpZ8RAWG880qExzeTKKshkWzxFnq94RFCqiwetKzo8QEZKUuuRSGeOa25SVMfKIpbxbrM3JFtESI4uVWVeDaZn1xBhAKhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIGCbcYld1LWzQPSkHR36vPMx8leRRzzt3mb47ScoDGCOo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/hino9
+
+==================================================================

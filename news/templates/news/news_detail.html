@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ news_article.display_title }}{% endblock %}
+
+{% block meta_description %}{{ news_article.display_summary }}{% endblock %}
+
+{% block canonical_url %}<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{% url 'news:detail' news_id=news_article.id slug=news_article.slug %}">{% endblock %}
+
+{% block og_url %}{{ request.scheme }}://{{ request.get_host }}{% url 'news:detail' news_id=news_article.id slug=news_article.slug %}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ news_article.display_title }}{% endblock %}
+{% block og_description %}{{ news_article.display_summary }}{% endblock %}
+{% block og_image %}{% if news_article.image_url %}{% if "http" in news_article.image_url %}{{ news_article.image_url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ news_article.image_url }}{% endif %}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'assets/images/android-chrome-512x512.png' %}{% endif %}{% endblock %}
+
+{% block twitter_title %}{{ news_article.display_title }}{% endblock %}
+{% block twitter_description %}{{ news_article.display_summary }}{% endblock %}
+{% block twitter_image %}{% if news_article.image_url %}{% if "http" in news_article.image_url %}{{ news_article.image_url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{{ news_article.image_url }}{% endif %}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'assets/images/android-chrome-512x512.png' %}{% endif %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": "{{ news_article.display_title|escapejs }}",
+    "description": "{{ news_article.display_summary|escapejs }}",
+    "image": [
+        {% if news_article.image_url %}
+        "{{ news_article.image_url|default:'http://localhost:8300' }}"
+        {% else %}
+        "{{ request.scheme }}://{{ request.get_host }}{% static 'assets/images/android-chrome-512x512.png' %}"
+        {% endif %}
+    ],
+    "datePublished": "{{ news_article.article_date|date:'Y-m-d' }}T{{ news_article.article_date|time:'H:i:s' }}Z",
+    "dateModified": "{{ news_article.updated_at|default:news_article.article_date|date:'Y-m-d' }}T{{ news_article.updated_at|default:news_article.article_date|time:'H:i:s' }}Z",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{% url 'news:detail' news_id=news_article.id slug=news_article.slug %}",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ request.scheme }}://{{ request.get_host }}{% url 'news:detail' news_id=news_article.id slug=news_article.slug %}"
+    },
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ news_article.site_name|default:'MTA Demo' }}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}"
+    },
+    "author": {
+        "@type": "Organization",
+        "name": "{{ news_article.site_name|default:'MTA Demo' }}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}"
+    },
+    "keywords": "{{ news_article.llm_tags|join:', '|default:'news' }}",
+    "articleSection": "{{ news_article.llm_tags|first|default:'General' }}",
+    "isAccessibleForFree": true
+}
+</script>
+{% endblock %}
+
+{% block content %}
+    <div class="mb-6">
+        {% if from_search %}
+            <a href="{% url 'news:search' %}?q={{ search_query }}&type={{ search_type }}{% if from_page %}&page={{ from_page }}{% endif %}&highlight_article={{ article_id }}" class="inline-flex items-center gap-2 link-primary">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Back to Search Results</span>
+            </a>
+        {% elif from_tag %}
+            <a href="{% url 'news:tag_detail' tag_slug %}{% if from_page %}?page={{ from_page }}{% endif %}&highlight_article={{ article_id }}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Back to {{ tag_name }} Articles</span>
+            </a>
+        {% else %}
+            <a href="{% url 'news:list' %}?page={{ from_page }}&highlight_article={{ article_id }}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Back to News List</span>
+            </a>
+        {% endif %}
+    </div>
+
+    <article class="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden">
+        <div class="p-6 pb-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-heading mb-4 leading-tight">{{ news_article.display_title }}</h1>
+
+            <!-- Article Meta -->
+            <div class="flex flex-wrap items-center gap-4 text-sm text-meta mb-6">
+                {% if news_article.article_date %}
+                    <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>{{ news_article.article_date|date:"M d, Y" }}</span>
+                    </div>
+                {% endif %}
+                {% if news_article.domain %}
+                    <div class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>{{ news_article.site_name|default:news_article.domain }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if news_article.image_url %}
+            <div class="px-6 mb-6">
+                <div id="image-container" class="flex justify-start items-center">
+                    <img 
+                        id="article-image"
+                        src="{{ news_article.image_url }}" 
+                        alt="Article image for {{ news_article.display_title }}" 
+                        class="rounded-lg"
+                        style="max-width: 600px; max-height: 600px;"
+                        loading="lazy"
+                        onerror="this.parentElement.style.display='none'"
+                    >
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Article Content -->
+        <div class="p-6 space-y-8">
+            <!-- Summary -->
+            {% if news_article.display_summary %}
+                <section>
+                    <h2 class="text-xl font-bold text-heading mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-accent-primary" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Summary
+                    </h2>
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-slate-300 leading-relaxed">{{ news_article.display_summary }}</p>
+                    </div>
+                </section>
+            {% endif %}
+            
+            <!-- Key Points -->
+            {% if news_article.llm_bullets %}
+                <section>
+                    <h2 class="text-xl font-bold text-heading mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-accent-primary" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        Key Points
+                    </h2>
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <ul class="space-y-3">
+                            {% for bullet in news_article.llm_bullets %}
+                                <li class="flex items-start gap-3">
+                                    <span class="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0"></span>
+                                    <span class="text-slate-300">{{ bullet }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+            {% endif %}
+
+            <!-- Tags -->
+            {% if news_article.llm_tags %}
+                <section>
+                    <h2 class="text-xl font-bold text-heading mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-accent-primary" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
+                        </svg>
+                        Tags
+                    </h2>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tag in news_article.llm_tags %}
+                            <a href="{% url 'news:tag_detail' tag_slug=tag|slugify %}" class="tag-hover px-3 py-1 tag-background tag-text rounded-full text-sm font-medium transition-colors duration-200">{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% if news_article.url %}
+                <section class="pt-6 border-t border-slate-700/50">
+                    <a href="{{ news_article.url }}" target="_blank" class="inline-flex items-center gap-2 link-primary">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Read Original Article</span>
+                    </a>
+                </section>
+            {% endif %}
+        </div>
+    </article>
+
+    <!-- Page-specific JavaScript -->
+    <script src="{% static 'js/news-detail.js' %}" defer></script>
+{% endblock %}

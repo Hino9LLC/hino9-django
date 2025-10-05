@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Latest News{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold text-heading mb-2">Latest News</h1>
+
+    {% if news_articles %}
+        <div class="space-y-6">
+            {% for article in news_articles %}
+                    <article id="article-{{ article.id }}" class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 transition-all duration-300 hover:shadow-xl">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {% if article.image_url %}
+                                <div class="md:col-span-1 md:order-2 flex justify-end">
+                                    <div class="thumbnail-container">
+                                        <img
+                                            src="{{ article.image_url }}"
+                                            alt="{{ article.display_title }}"
+                                            class="rounded-lg"
+                                            loading="lazy"
+                                            onerror="this.style.display='none'"
+                                        >
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="md:col-span-2 md:order-1">
+                            <h3 class="text-xl font-bold mb-3">
+                                <a href="{% url 'news:detail' article.id article.slug %}?from_page={{ page_obj.number }}" class="link-title">
+                                    {{ article.display_title }}
+                                </a>
+                            </h3>
+
+                            <!-- Article Meta -->
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-meta mb-4">
+                                {% if article.article_date %}
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span>{{ article.article_date|date:"M d, Y" }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if article.domain %}
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span>{{ article.site_name|default:article.domain }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if article.display_summary %}
+                                <p class="text-body mb-4 leading-relaxed">{{ article.display_summary|truncatewords:50 }}</p>
+                            {% endif %}
+
+                            <!-- Tags -->
+                            {% if article.llm_tags %}
+                                <div class="flex flex-wrap gap-2">
+                                    {% for tag in article.llm_tags|slice:":5" %}
+                                        <a href="{% url 'news:tag_detail' tag_slug=tag|slugify %}{% if page_obj.number > 1 %}?from_page={{ page_obj.number }}{% endif %}" class="tag-hover">{{ tag }}</a>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            </div>
+                        </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if news_articles and page_obj.has_other_pages %}
+            <div style="margin-top: 3rem; margin-bottom: 3rem;" class="flex flex-col items-center space-y-4">
+                <div class="flex items-center justify-center gap-2">
+                    <!-- Previous Page -->
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-accent-primary hover:text-accent-secondary transition-colors duration-200">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    <!-- Page Info -->
+                    <div class="px-6 py-2 text-sm text-heading font-medium">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </div>
+
+                    <!-- Next Page -->
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-accent-primary hover:text-accent-secondary transition-colors duration-200">
+                            Next
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Page Range Info -->
+                <div class="text-sm text-meta text-center">
+                    Showing {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ total_count }} articles
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-8 border border-slate-700/50 text-center">
+            <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-meta" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h8a2 2 0 012 2v10a2 2 0 002 2H4a2 2 0 01-2-2V5zm3 1h6v4H5V6zm6 6H5v2h6v-2z" clip-rule="evenodd"></path>
+                    <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V9a1 1 0 00-1-1h-1v-1z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-heading mb-2">No News Articles Found</h3>
+            <p class="text-meta">There are currently no news articles in the database.</p>
+        </div>
+    {% endif %}
+{% endblock %}

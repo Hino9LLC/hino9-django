@@ -1,0 +1,136 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth" id="html-root">
+<head>
+    <title>{% block title %}{% endblock %} - HINO9</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="{% block meta_description %}HINO9 - AI Powered AI News{% endblock %}">
+
+    <!-- Open Graph / Social Media Tags -->
+    <meta property="og:site_name" content="HINO9">
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{% if title %}{{ title }}{% else %}HINO9 - AI Powered AI News{% endif %}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}HINO9 - AI Powered AI News{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'assets/images/android-chrome-512x512.png' %}{% endblock %}">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{% if title %}{{ title }}{% else %}HINO9 - AI Powered AI News{% endif %}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}HINO9 - AI Powered AI News{% endblock %}">
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'assets/images/android-chrome-512x512.png' %}{% endblock %}">
+
+    <!-- Canonical URL -->
+    {% block canonical_url %}{% endblock %}
+
+    <!-- Structured Data (JSON-LD) -->
+    {% block structured_data %}{% endblock %}
+
+    <!-- Favicons & Web Manifest -->
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/images/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/images/favicon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/images/favicon-32x32.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/images/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'assets/config/site.webmanifest' %}">
+    <meta name="theme-color" content="#2c3e50">
+
+    {% tailwind_css %}
+
+    <!-- Google Analytics -->
+    {% if not debug and GOOGLE_ANALYTICS_ID %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ GOOGLE_ANALYTICS_ID }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ GOOGLE_ANALYTICS_ID }}');
+    </script>
+    {% endif %}
+
+</head>
+
+<body class="min-h-screen flex flex-col text-slate-200 font-sans antialiased transition-all duration-300">
+
+    <nav class="sticky top-0 z-50 backdrop-blur-md bg-nav-primary border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="flex items-center gap-3">
+                            <a href="/" class="text-4xl md:text-5xl font-bold text-white hover:text-white transition-colors duration-200 no-underline">HINO9</a>
+                            <span class="text-base md:text-lg text-slate-400 font-normal italic">AI Powered AI News</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{% url 'news:list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-200 whitespace-nowrap">
+                            Latest News
+                        </a>
+                        <a href="{% url 'news:tags_index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-200">
+                            Tags
+                        </a>
+                        <a href="{% url 'news:search' %}" class="px-3 py-2 rounded-md text-sm font-medium text-slate-300 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-200">
+                            Search
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex items-center">
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="p-2 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 bg-nav-secondary backdrop-blur-md border-t border-slate-700/50">
+                <a href="{% url 'news:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-200">
+                    Latest News
+                </a>
+                <a href="{% url 'news:tags_index' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-200">
+                    Tags
+                </a>
+                <a href="{% url 'news:search' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-300 hover:text-primary-400 hover:bg-slate-800/50 transition-all duration-200">
+                    Search
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto bg-footer-primary backdrop-blur-md border-t border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-sm text-slate-400">
+                <p class="mb-4">&copy; 2025 HINO9 - AI Powered AI News</p>
+                <p>
+                    <a href="{% url 'news:privacy_policy' %}" class="hover:text-primary-400 transition-colors">Privacy Policy</a>
+                    <span class="mx-2">|</span>
+                    <a href="{% url 'news:terms_conditions' %}" class="hover:text-primary-400 transition-colors">Terms & Conditions</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Common JavaScript -->
+    <script src="{% static 'js/common.js' %}" defer></script>
+</body>
+</html>

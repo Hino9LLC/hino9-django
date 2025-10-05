@@ -1,0 +1,368 @@
+@import "tailwindcss";
+
+/**
+  * A catch-all path to Django template files, JavaScript, and Python files
+  * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
+  *
+  * If your final CSS file is not being updated after code changes, you may want to broaden or narrow
+  * the scope of this path.
+  */
+@source "../../../**/*.{html,py,js}";
+
+/* ===============================================
+   🎨 TAILWIND V4 THEME CONFIGURATION
+   ===============================================
+
+   Extends Tailwind's default theme with semantic color tokens.
+   These become available as both CSS variables and Tailwind utilities.
+*/
+@theme {
+  /* Semantic color tokens for the purple theme */
+  --color-accent-primary: #60a5fa;
+  --color-accent-secondary: #93c5fd;
+  --color-accent-button: #4f46e5;
+
+  --color-text-heading: #e2e8f0;
+  --color-text-body: #cbd5e1;
+  --color-text-meta: #94a3b8;
+
+  --color-surface-primary: rgba(30, 41, 59, 0.5);
+  --color-border-primary: rgba(51, 65, 85, 0.5);
+
+  --color-tag-background: rgba(79, 70, 229, 0.15);
+
+  --color-nav-primary: rgba(15, 23, 42, 0.8);
+  --color-nav-secondary: rgba(15, 23, 42, 0.95);
+  --color-footer-primary: rgba(15, 23, 42, 0.5);
+
+  --color-hover-primary: rgba(147, 197, 253, 0.4);
+  --color-hover-secondary: rgba(147, 197, 253, 0.3);
+}
+
+/* ===============================================
+   🟣 PURPLE THEME - Integrated into Main Stylesheet
+   ===============================================
+
+   This theme is now the single, permanent theme for the application.
+   No theme switching - purple theme is always active.
+*/
+
+/* 🎨 COLOR VARIABLES - Purple Theme */
+:root {
+  /* Accent Colors - Interactive elements */
+  --color-accent-primary: var(--color-primary-400);        /* Links, highlights, tag text */
+  --color-accent-secondary: var(--color-primary-300);      /* Hover states */
+  --color-accent-button: #4f46e5;          /* Buttons, focus, radio selected */
+
+  /* Text Colors - Typography hierarchy */
+  --color-text-heading: #e2e8f0;          /* Primary headings */
+  --color-text-body: #cbd5e1;            /* Body text */
+  --color-text-meta: #94a3b8;            /* Meta text, navigation */
+
+  /* Surface & Structure */
+  --color-surface-primary: rgba(30, 41, 59, 0.5);    /* Card backgrounds */
+  --color-border-primary: rgba(51, 65, 85, 0.5);     /* Borders */
+
+  /* Tag & Radio Components */
+  --color-tag-background: rgba(79, 70, 229, 0.15);   /* Tags, radio unselected */
+
+  /* Navigation & Header Backgrounds */
+  --color-nav-primary: rgba(15, 23, 42, 0.8); /* slate-900/80 */
+  --color-nav-secondary: rgba(15, 23, 42, 0.95); /* slate-900/95 */
+  --color-footer-primary: rgba(15, 23, 42, 0.5); /* slate-900/50 */
+
+  /* Hover Colors */
+  --color-hover-primary: rgba(147, 197, 253, 0.4);    /* Tag hover */
+  --color-hover-secondary: rgba(147, 197, 253, 0.3);   /* Button hover */
+
+  /* Primary Brand Colors - Purple Theme */
+  --color-primary-50: #eff6ff;    /* light blue */
+  --color-primary-100: #dbeafe;  /* very light blue */
+  --color-primary-300: #93c5fd;  /* light blue */
+  --color-primary-400: #60a5fa;  /* medium blue */
+  --color-primary-500: #3b82f6;  /* blue */
+  --color-primary-600: #2563eb;  /* dark blue */
+  --color-primary-700: #1d4ed8;  /* darker blue */
+  --color-primary-800: #1e40af;  /* very dark blue */
+  --color-primary-900: #1e3a8a;  /* darkest blue */
+}
+
+/* 🎨 SEMANTIC UTILITY CLASSES - Purple Theme */
+
+/* Text Color Utilities */
+.text-heading { color: var(--color-text-heading); }
+.text-body { color: var(--color-text-body); }
+.text-meta { color: var(--color-text-meta); }
+
+/* Primary Color Utilities (used in search and detail pages) */
+.text-primary-300 { color: var(--color-primary-300); }
+.text-primary-400 { color: var(--color-primary-400); }
+.text-primary-500 { color: var(--color-primary-500); }
+.bg-primary-500 { background-color: var(--color-primary-500); }
+.bg-primary-600 { background-color: var(--color-primary-600); }
+.bg-primary-700 { background-color: var(--color-primary-700); }
+.hover\:text-primary-300:hover { color: var(--color-primary-300); }
+.hover\:text-primary-400:hover { color: var(--color-primary-400); }
+.hover\:bg-primary-600:hover { background-color: var(--color-primary-600); }
+.hover\:bg-primary-700:hover { background-color: var(--color-primary-700); }
+.border-primary-500 { border-color: var(--color-primary-500); }
+.focus\:ring-primary-500:focus { --tw-ring-color: var(--color-primary-500); }
+.focus\:border-primary-500:focus { border-color: var(--color-primary-500); }
+
+/* Accent Color Utilities */
+.text-accent-primary { color: var(--color-accent-primary); }
+.text-accent-secondary { color: var(--color-accent-secondary); }
+
+/* Background Color Utilities */
+.bg-surface-primary { background-color: var(--color-surface-primary); }
+.bg-nav-primary { background-color: var(--color-nav-primary); }
+.bg-nav-secondary { background-color: var(--color-nav-secondary); }
+.bg-footer-primary { background-color: var(--color-footer-primary); }
+
+/* Border Color Utilities */
+.border-primary { border-color: var(--color-border-primary); }
+
+/* Focus Utilities */
+.focus\:ring-accent:focus { --tw-ring-color: var(--color-accent-button); }
+.focus\:border-accent:focus { border-color: var(--color-accent-button); }
+
+/* Component Utilities */
+.tag-background { background-color: var(--color-tag-background); }
+.tag-text { color: var(--color-accent-primary); }
+.radio-indicator { background-color: var(--color-accent-button); }
+.radio-background { background-color: var(--color-tag-background); }
+
+/* 🎯 COMPONENT STYLES - Purple Theme */
+
+/* Button Components */
+.btn-primary {
+  background-color: var(--color-accent-button);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-secondary);
+}
+
+.btn-secondary {
+  background-color: var(--color-tag-background);
+  color: var(--color-accent-primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-hover-secondary);
+}
+
+/* Link Components */
+.link-primary {
+  color: var(--color-accent-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link-primary:hover {
+  color: var(--color-accent-secondary);
+}
+
+.link-title {
+  color: var(--color-text-heading);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link-title:hover {
+  color: var(--color-accent-primary);
+}
+
+/* Card Components */
+.card {
+  background-color: var(--color-surface-primary);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.card--padded {
+  padding: 1.5rem;
+}
+
+.card--padded-lg {
+  padding: 2rem;
+}
+
+/* Article Card Components */
+.article-card {
+  background-color: var(--color-surface-primary);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.article-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.article-card__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .article-card__content {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+.article-card__main {
+  flex: 1;
+}
+
+.article-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.article-card__title-link {
+  color: var(--color-text-heading);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.article-card__title-link:hover {
+  color: var(--color-accent-primary);
+}
+
+.article-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text-meta);
+  margin-bottom: 1rem;
+}
+
+.article-card__summary {
+  color: var(--color-text-body);
+  margin-bottom: 1rem;
+  line-height: 1.625;
+}
+
+.article-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.article-card__footer {
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border-primary);
+}
+
+/* Tag Components */
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 1rem;
+  background-color: var(--color-tag-background);
+  color: var(--color-accent-primary);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+a.tag-pill:hover,
+.tag-pill:hover {
+  background-color: var(--color-hover-primary);
+}
+
+.tag-pill--active {
+  border: 2px solid var(--color-accent-button);
+}
+
+/* Legacy tag-hover class */
+.tag-hover {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 1rem;
+  background-color: var(--color-tag-background);
+  color: var(--color-accent-primary);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+a.tag-hover:hover,
+.tag-hover:hover {
+  background-color: var(--color-hover-primary);
+}
+
+/* Card Hover Effects */
+.card-hover {
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Thumbnail Sizing */
+.thumbnail-container {
+  width: 100%;
+  height: 150px;
+  flex-shrink: 0;
+  order: -1;
+}
+
+@media (min-width: 768px) {
+  .thumbnail-container {
+    width: 100%;
+    max-width: 260px;
+    height: 160px;
+    order: 1;
+    margin-left: auto;
+  }
+}
+
+.thumbnail-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+/* 🎨 BODY BACKGROUND - Purple Theme */
+body {
+  background-color: #020617; /* Very dark blue-black */
+}
+
+/*
+  SINGLE THEME SYSTEM
+  ===================
+
+  The application uses a single, permanent purple theme
+  that is integrated directly into the main stylesheet.
+
+  No theme switching - purple theme is always active.
+  All utility classes and components are provided by Tailwind CSS.
+*/
