@@ -1,4 +1,5 @@
-FROM python:3.11-slim AS builder
+# Builder stage
+FROM python:3.12-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -16,6 +17,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     rm -rf /var/lib/apt/lists/*
 
+# Create non-root user early to ensure correct permissions
+RUN useradd -m -u 1000 appuser
+
 WORKDIR /app
 
 # Copy uv binary from official image
@@ -24,22 +28,23 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 # Copy dependency files
 COPY pyproject.toml uv.lock ./
 
-# Install Python dependencies
-RUN uv sync --frozen --no-dev
+# Install Python dependencies as appuser to avoid root-owned venv
+RUN --mount=type=cache,target=/home/appuser/.cache/uv \
+    mkdir -p /home/appuser/.cache/uv && \
+    chown -R appuser:appuser /app /home/appuser/.cache && \
+    su appuser -c "cd /app && uv sync --frozen --no-dev"
 
 # Copy application code
-COPY . .
+COPY --chown=appuser:appuser . .
 
-# Build Tailwind CSS
-RUN cd theme/static_src && \
-    npm install && \
-    npm run build
+# Build Tailwind CSS as appuser
+RUN su appuser -c "cd /app/theme/static_src && npm install && npm run build"
 
-# Collect static files
-RUN uv run python manage.py collectstatic --noinput
+# Collect static files as appuser
+RUN su appuser -c "cd /app && uv run python manage.py collectstatic --noinput"
 
 # Production stage
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -53,16 +58,19 @@ RUN apt-get update && \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
+# Create non-root user
+RUN useradd -m -u 1000 appuser
+
 WORKDIR /app
 
 # Copy uv binary
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Copy installed dependencies and application from builder
-COPY --from=builder /app /app
+COPY --from=builder --chown=appuser:appuser /app /app
 
-# For now, run as root to avoid permission issues
-# TODO: Implement proper non-root user after fixing venv permissions
+# Run as non-root user
+USER appuser
 
 EXPOSE 8300
 

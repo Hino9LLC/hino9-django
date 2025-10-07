@@ -141,7 +141,7 @@ graph TB
 ## 🔧 Technology Stack
 
 - **Django 5.2.6**: Web framework with class-based and function-based views, admin interface, ORM
-- **Python 3.11+**: Modern Python with type hints (MyPy strict mode) and async support
+- **Python 3.12+**: Modern Python with type hints (MyPy strict mode) and async support
 - **uv**: Fast Rust-based package manager replacing pip/pipenv/poetry
 - **PostgreSQL + pgvector**: Vector similarity search with IVFFlat indexes on 768-dim embeddings
 - **Redis 7**: Production caching and rate limiting (optional, falls back to LocMemCache)

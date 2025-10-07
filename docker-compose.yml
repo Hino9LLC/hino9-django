@@ -1,18 +1,3 @@
-# Local development environment for ainews Django application
-#
-# This docker-compose setup provides production parity for local testing:
-# - Uses Gunicorn (same as production) instead of runserver
-# - Connects to existing local PostgreSQL via host.docker.internal
-# - Runs Redis for caching and rate limiting
-# - Serves static files via WhiteNoise (same as production)
-#
-# Usage:
-#   docker compose up -d      # Start services
-#   docker compose logs -f    # View logs
-#   docker compose down       # Stop services
-#
-# For development with hot CSS reload, use: make run
-
 services:
   redis:
     image: redis:7-alpine
@@ -47,6 +32,9 @@ services:
     environment:
       # UV settings
       - UV_LINK_MODE=copy
+      - UV_CACHE_DIR=/home/appuser/.cache/uv  # Ensure cache is user-writable
+      - VIRTUAL_ENV=/app/.venv  # Use existing virtual environment
+      - UV_PYTHON=python3.12  # Use Python 3.12 (same as build stage)
 
       # Django settings
       - SECRET_KEY=${SECRET_KEY}
@@ -87,7 +75,7 @@ services:
       retries: 3
       start_period: 40s
     restart: unless-stopped
-    command: sh -c "uv run python manage.py collectstatic --noinput && uv run gunicorn ainews.wsgi:application --bind 0.0.0.0:8300 --workers 2 --timeout 60 --reload --access-logfile - --error-logfile -"
+    command: sh -c "uv run gunicorn ainews.wsgi:application --bind 0.0.0.0:8300 --workers ${WORKERS:-2} --timeout 60 --reload --access-logfile - --error-logfile -"
     extra_hosts:
       # Allow container to connect to host's postgres
       - "host.docker.internal:host-gateway"
