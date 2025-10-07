@@ -7,23 +7,7 @@
 {% block og_url %}{{ request.scheme }}://{{ request.get_host }}{% url 'news:tag_detail' tag_slug %}{% endblock %}
 
 {% block content %}
-    <div class="mb-6">
-        {% if from_source == "tags" %}
-            <a href="{% url 'news:tags_index' %}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Back to Tags List</span>
-            </a>
-        {% else %}
-            <a href="{% url 'news:list' %}{% if from_page %}?page={{ from_page }}{% endif %}{% if highlight_article %}{% if from_page %}&{% else %}?{% endif %}highlight_article={{ highlight_article }}{% endif %}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Back to News List</span>
-            </a>
-        {% endif %}
-    </div>
+    <div data-page-type="listing">
 
     <!-- Tag Header -->
     <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 mb-8">
@@ -72,7 +56,7 @@
 
                         <div class="md:col-span-2 md:order-1">
                             <h3 class="text-xl font-bold mb-3">
-                                <a href="{% url 'news:detail' article.id article.slug %}?from_tag=1&tag_slug={{ tag_slug }}&tag_name={{ tag_name }}&from_page={{ page_obj.number }}" class="link-title">
+                                <a href="{% url 'news:detail' article.id article.slug %}" class="link-title">
                                     {{ article.display_title }}
                                 </a>
                             </h3>
@@ -174,4 +158,5 @@
             </a>
         </div>
     {% endif %}
+    </div>
 {% endblock %}

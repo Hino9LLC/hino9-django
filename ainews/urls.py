@@ -16,6 +16,7 @@ Including another URLconf
 """
 
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.http import HttpRequest, JsonResponse
@@ -58,12 +59,11 @@ urlpatterns = [
 
 # Development-only URLs
 if settings.DEBUG:
-    from django.conf.urls.static import static
-
     # Add browser reload only in DEBUG mode
     urlpatterns.append(path("__reload__/", include("django_browser_reload.urls")))
-    # Serve static files in development
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+# Serve static files in development (and also in production for compatibility)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom error handlers
 # Must be defined at module level in root URLconf

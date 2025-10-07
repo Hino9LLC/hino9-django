@@ -40,8 +40,8 @@ COPY --chown=appuser:appuser . .
 # Build Tailwind CSS as appuser
 RUN su appuser -c "cd /app/theme/static_src && npm install && npm run build"
 
-# Collect static files as appuser
-RUN su appuser -c "cd /app && uv run python manage.py collectstatic --noinput"
+# Collect static files as appuser (for production-like container)
+RUN su appuser -c "cd /app && uv run python manage.py collectstatic --noinput --clear"
 
 # Production stage
 FROM python:3.12-slim

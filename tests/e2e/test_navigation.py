@@ -68,29 +68,33 @@ def test_tag_browsing_journey(page: Page) -> None:
 
 
 @pytest.mark.navigation
-def test_navigation_context_in_url(page: Page) -> None:
+def test_navigation_clean_urls(page: Page) -> None:
     """
-    Test: Verify navigation context is properly encoded in URLs.
+    Test: Verify article detail URLs are clean (no navigation context params).
 
-    Validates that context parameters (from_page, from_search, from_tag)
-    are correctly added to article detail URLs.
+    Validates that we use localStorage + browser back navigation instead of
+    complex URL parameters for navigation context.
     """
-    # Test from_page context
+    # Test from news list page 2
     page.goto("/?page=2")
     if page.locator("article").first.is_visible():
         page.locator("article").first.locator("a").first.click()
 
-        # Verify from_page parameter in URL
-        assert "from_page=2" in page.url
+        # Verify NO navigation context parameters in URL (clean URLs)
+        assert "from_page" not in page.url
+        assert "highlight_article" not in page.url
+        # URL should just be clean article URL like /123/article-slug/ (no query params)
+        assert "?" not in page.url
 
-    # Test from_search context
+    # Test from search results
     page.goto("/search/?q=test&type=hybrid")
     if page.locator("article").first.is_visible():
         page.locator("article").first.locator("a").first.click()
 
-        # Verify from_search and search parameters
-        assert "from_search=1" in page.url or "from_search" in page.url
-        assert "q=test" in page.url  # Query is preserved
+        # Verify NO navigation context parameters (clean URLs)
+        assert "from_search" not in page.url
+        assert "highlight_article" not in page.url
+        # Should have clean article URL, not search context params
 
 
 @pytest.mark.navigation

@@ -20,15 +20,10 @@ services:
     ports:
       - "8300:8300"
     volumes:
-      # Mount source code for hot reload
-      - .:/app
-      # Exclude these from mount to use container's versions
+      # Minimal volumes for production-like testing
+      # No source code mounting - use container's built version
       - /app/.venv
-      - /app/node_modules
-      - /app/theme/static_src/node_modules
-      - /app/.mypy_cache
-      - /app/.pytest_cache
-      - /app/.ruff_cache
+      - /app/staticfiles  # Use container's collected static files
     environment:
       # UV settings
       - UV_LINK_MODE=copy

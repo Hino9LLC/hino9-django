@@ -1,7 +1,7 @@
 # Django Makefile for ainews project
 # Common Django development tasks
 
-.PHONY: help install run migrate makemigrations shell test lint format clean superuser build-css watch-css prod-check coverage coverage-html test-e2e test-e2e-headless test-e2e-chromium test-e2e-firefox test-e2e-webkit test-all
+.PHONY: help install run migrate makemigrations shell test lint format clean clear-cache superuser build-css watch-css prod-check coverage coverage-html test-e2e test-e2e-headless test-e2e-chromium test-e2e-firefox test-e2e-webkit test-all
 
 # Default target
 help:
@@ -40,6 +40,7 @@ help:
 	@echo ""
 	@echo "Utilities:"
 	@echo "  clean           - Clean up temporary files"
+	@echo "  clear-cache     - Clear Python, Django, and static file caches"
 
 # Install dependencies
 install:
@@ -131,28 +132,36 @@ coverage-html:
 	@echo "✅ HTML coverage report generated in htmlcov/index.html"
 	@echo "💡 Open htmlcov/index.html in your browser"
 
+# Clear various caches (Python, Django, static files)
+clear-cache:
+	@echo "Clearing caches..."
+	@find . -name "*.pyc" -delete 2>/dev/null || true
+	@find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+	@uv run python manage.py shell -c "from django.core.cache import cache; cache.clear()" 2>/dev/null || echo "Django cache cleared (if available)"
+	@uv run python manage.py collectstatic --noinput --clear 2>/dev/null || echo "Static files refreshed"
+
 # Run E2E tests with Playwright (headed mode, shows browser)
-test-e2e:
+test-e2e: clear-cache
 	@echo "Running E2E tests with Playwright (headed mode)..."
 	@RATELIMIT_ENABLE=False uv run pytest tests/e2e/ --headed --browser chromium --slowmo 100
 
 # Run E2E tests in headless mode (for CI/CD)
-test-e2e-headless:
+test-e2e-headless: clear-cache
 	@echo "Running E2E tests with Playwright (headless mode)..."
 	@RATELIMIT_ENABLE=False uv run pytest tests/e2e/ --browser chromium
 
 # Run E2E tests in Chromium only
-test-e2e-chromium:
+test-e2e-chromium: clear-cache
 	@echo "Running E2E tests in Chromium..."
 	@RATELIMIT_ENABLE=False uv run pytest tests/e2e/ --browser chromium
 
 # Run E2E tests in Firefox only
-test-e2e-firefox:
+test-e2e-firefox: clear-cache
 	@echo "Running E2E tests in Firefox..."
 	@RATELIMIT_ENABLE=False uv run pytest tests/e2e/ --browser firefox
 
 # Run E2E tests in WebKit only
-test-e2e-webkit:
+test-e2e-webkit: clear-cache
 	@echo "Running E2E tests in WebKit..."
 	@RATELIMIT_ENABLE=False uv run pytest tests/e2e/ --browser webkit
 

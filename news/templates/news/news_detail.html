@@ -56,29 +56,13 @@
 {% endblock %}
 
 {% block content %}
-    <div class="mb-6">
-        {% if from_search %}
-            <a href="{% url 'news:search' %}?q={{ search_query }}&type={{ search_type }}{% if from_page %}&page={{ from_page }}{% endif %}&highlight_article={{ article_id }}" class="inline-flex items-center gap-2 link-primary">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Back to Search Results</span>
-            </a>
-        {% elif from_tag %}
-            <a href="{% url 'news:tag_detail' tag_slug %}{% if from_page %}?page={{ from_page }}{% endif %}&highlight_article={{ article_id }}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Back to {{ tag_name }} Articles</span>
-            </a>
-        {% else %}
-            <a href="{% url 'news:list' %}?page={{ from_page }}&highlight_article={{ article_id }}" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
-                </svg>
-                <span>Back to News List</span>
-            </a>
-        {% endif %}
+    <div class="mb-6 hidden md:block">
+        <a href="#" onclick="history.back(); return false;" class="inline-flex items-center gap-2 text-accent-primary hover:text-accent-secondary font-medium transition-colors duration-200">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Back</span>
+        </a>
     </div>
 
     <article class="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden">
@@ -193,4 +177,11 @@
 
     <!-- Page-specific JavaScript -->
     <script src="{% static 'js/news-detail.js' %}" defer></script>
+
+    <!-- Set article highlight data for back navigation -->
+    <script>
+        (function() {
+            localStorage.setItem('article_highlight', '{{ news_article.id }}');
+        })();
+    </script>
 {% endblock %}

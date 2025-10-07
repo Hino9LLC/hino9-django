@@ -6,6 +6,22 @@
 (function() {
   'use strict';
 
+  // Simple tracking - just remember what we highlighted
+  var alreadyHighlighted = null;
+  var isHighlightingInProgress = false; // Prevent concurrent highlighting
+
+  /**
+   * Cancel any existing highlight for an article
+   */
+  function cancelExistingHighlight(articleId) {
+    const targetElement = document.getElementById('article-' + articleId);
+    if (targetElement) {
+      targetElement.style.outline = '';
+      targetElement.style.boxShadow = '';
+      targetElement.style.transition = '';
+    }
+  }
+
   /**
    * Sets up mobile menu toggle functionality
    */
@@ -28,68 +44,101 @@
     });
   }
 
-  /**
-   * Restores scroll position and highlights an article based on URL parameters
-   * Used when navigating back from detail pages, tag pages, or search results
-   */
-  function restoreScrollAndHighlight() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const highlightArticleId = urlParams.get('highlight_article');
 
-    if (!highlightArticleId) return;
-
-    const targetElement = document.getElementById('article-' + highlightArticleId);
-    if (!targetElement) return;
-
-    // Wait a bit for the page to fully load, then scroll smoothly
-    setTimeout(function() {
-      targetElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-
-      // Add a temporary highlight effect
-      targetElement.style.transition = 'all 0.3s ease';
-      targetElement.style.boxShadow = '0 0 0 3px rgba(99, 102, 241, 0.5)';
-
-      // Remove the highlight after animation
-      setTimeout(function() {
-        targetElement.style.boxShadow = '';
-      }, 2000);
-    }, 100);
-
-    // Clean up the URL parameter after highlighting
-    const page = urlParams.get('page');
-    const query = urlParams.get('q');
-    const type = urlParams.get('type');
-
-    let newUrl = window.location.pathname;
-    const params = [];
-
-    if (page) params.push('page=' + encodeURIComponent(page));
-    if (query) params.push('q=' + encodeURIComponent(query));
-    if (type) params.push('type=' + encodeURIComponent(type));
-
-    if (params.length > 0) {
-      newUrl += '?' + params.join('&');
-    }
-
-    window.history.replaceState({}, '', newUrl);
+  // Prevent browser's automatic scroll restoration
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
   }
 
-  // Auto-initialize on DOMContentLoaded
-  document.addEventListener('DOMContentLoaded', function() {
-    setupMobileMenu();
+  // Fast initialization - check immediately for highlights
+  function simpleInit() {
+    if (document.querySelector('[data-page-type="listing"]')) {
+      setupMobileMenu();
 
-    // Only run scroll restore on pages with articles
-    if (document.querySelector('[id^="article-"]')) {
-      restoreScrollAndHighlight();
+      // Check for highlights right away - no delay
+      setTimeout(function() {
+        checkArticleHighlightData();
+      }, 100); // Just enough time for DOM to be ready
+    }
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', simpleInit);
+  } else {
+    simpleInit();
+  }
+
+  // Handle browser back/forward navigation (more strict)
+  window.addEventListener('pageshow', function(event) {
+    // Only run on actual back/forward navigation AND only if page was from cache
+    if (event.persisted && document.querySelector('[data-page-type="listing"]')) {
+      // Add a small delay to ensure the page is fully loaded
+      setTimeout(function() {
+        checkArticleHighlightData();
+      }, 200);
     }
   });
 
-  // Optional: Expose utilities for manual calls if needed
-  window.NewsApp = window.NewsApp || {};
-  window.NewsApp.scrollRestore = restoreScrollAndHighlight;
-  window.NewsApp.setupMobileMenu = setupMobileMenu;
+  function initializePage() {
+    // Keep this for compatibility but make it simple
+    simpleInit();
+  }
+
+  /**
+   * Checks for article highlight data and scrolls to article if present.
+   */
+  function checkArticleHighlightData() {
+    // Prevent concurrent highlighting
+    if (isHighlightingInProgress) {
+      return;
+    }
+
+    const articleId = localStorage.getItem('article_highlight');
+
+    if (articleId && articleId !== '' && articleId !== alreadyHighlighted) {
+      isHighlightingInProgress = true;
+      alreadyHighlighted = articleId;
+      scrollToAndHighlightArticle(articleId);
+
+      // Clear localStorage after a delay
+      setTimeout(function() {
+        localStorage.removeItem('article_highlight');
+        isHighlightingInProgress = false;
+      }, 2000);
+    }
+  }
+
+  /**
+   * Scrolls to an article and applies temporary highlight effect.
+   */
+  function scrollToAndHighlightArticle(articleId) {
+    const targetElement = document.getElementById('article-' + articleId);
+
+    if (!targetElement) {
+      isHighlightingInProgress = false; // Reset flag if element not found
+      return;
+    }
+
+    // Scroll to the article
+    targetElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    // Box shadow highlight - no layout shift
+    setTimeout(function() {
+      targetElement.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.3)';
+
+      // Remove highlight after delay
+      setTimeout(function() {
+        targetElement.style.boxShadow = '';
+      }, 1500);
+    }, 500);
+  }
+
+// Optional: Expose utilities for manual calls if needed
+window.NewsApp = window.NewsApp || {};
+window.NewsApp.setupMobileMenu = setupMobileMenu;
 
 })();

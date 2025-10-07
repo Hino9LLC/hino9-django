@@ -3,7 +3,8 @@
 {% block title %}Latest News{% endblock %}
 
 {% block content %}
-    <h1 class="text-2xl font-bold text-heading mb-2">Latest News</h1>
+    <div data-page-type="listing">
+        <h1 class="text-2xl font-bold text-heading mb-2">Latest News</h1>
 
     {% if news_articles %}
         <div class="space-y-6">
@@ -26,7 +27,7 @@
 
                             <div class="md:col-span-2 md:order-1">
                             <h3 class="text-xl font-bold mb-3">
-                                <a href="{% url 'news:detail' article.id article.slug %}?from_page={{ page_obj.number }}" class="link-title">
+                                <a href="{% url 'news:detail' article.id article.slug %}" class="link-title">
                                     {{ article.display_title }}
                                 </a>
                             </h3>
@@ -117,4 +118,5 @@
             <p class="text-meta">There are currently no news articles in the database.</p>
         </div>
     {% endif %}
+    </div>
 {% endblock %}

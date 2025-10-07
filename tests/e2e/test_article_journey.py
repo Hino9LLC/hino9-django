@@ -134,7 +134,7 @@ def test_article_navigation_on_mobile(mobile_page: Page) -> None:
     1. Visit homepage on mobile device
     2. Click on article
     3. Verify mobile-friendly layout
-    4. Navigate back
+    4. Navigate back using browser back button (back link is hidden on mobile)
     """
     # Navigate to homepage
     mobile_page.goto("/")
@@ -148,10 +148,8 @@ def test_article_navigation_on_mobile(mobile_page: Page) -> None:
     # Verify article displays on mobile
     expect(mobile_page.locator("h1")).to_be_visible()
 
-    # Verify back button works
-    back_link = mobile_page.locator("a").filter(has_text="Back")
-    expect(back_link.first).to_be_visible()
-    back_link.first.click()
+    # Verify browser back button works (back link is hidden on mobile)
+    mobile_page.go_back()
 
     # Verify returned to homepage
     assert mobile_page.url.endswith("/") or "?page=" in mobile_page.url
