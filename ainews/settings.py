@@ -218,6 +218,9 @@ STATICFILES_DIRS = [
 # Tailwind settings
 TAILWIND_APP_NAME = "theme"
 
+# WhiteNoise settings
+WHITENOISE_COMPRESS = True  # Enable Brotli/Gzip compression for static files
+
 # Security settings for production (when behind Nginx proxy)
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

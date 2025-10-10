@@ -93,13 +93,14 @@
         {% if news_article.image_url %}
             <div class="px-6 mb-6">
                 <div id="image-container" class="flex justify-start items-center">
-                    <img 
+                    <img
                         id="article-image"
-                        src="{{ news_article.image_url }}" 
-                        alt="Article image for {{ news_article.display_title }}" 
+                        src="{{ news_article.image_url }}"
+                        alt="Article image for {{ news_article.display_title }}"
                         class="rounded-lg"
                         style="max-width: 600px; max-height: 600px;"
                         loading="lazy"
+                        decoding="async"
                         onerror="this.parentElement.style.display='none'"
                     >
                 </div>

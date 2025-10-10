@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Latest News{% endblock %}
 
@@ -19,6 +20,7 @@
                                             alt="{{ article.display_title }}"
                                             class="rounded-lg"
                                             loading="lazy"
+                                            decoding="async"
                                             onerror="this.style.display='none'"
                                         >
                                     </div>
@@ -119,4 +121,9 @@
         </div>
     {% endif %}
     </div>
+{% endblock %}
+
+{% block page_scripts %}
+    <!-- Article highlighting script (listing page only) -->
+    <script src="{% static 'js/common.js' %}" defer></script>
 {% endblock %}

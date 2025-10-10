@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
-from django.http import HttpRequest, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import include, path
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
@@ -32,6 +32,33 @@ from news.views import KeybaseTxtView, RobotsTxtView
 def health_check(request: HttpRequest) -> JsonResponse:
     """Health check endpoint for Docker and load balancers."""
     return JsonResponse({"status": "healthy"}, status=200)
+
+
+def favicon_view(request: HttpRequest) -> HttpResponse:
+    """
+    Serve favicon.ico directly from static files.
+
+    Browsers automatically request /favicon.ico from the root domain.
+    This view serves the favicon directly without redirects.
+    """
+    from django.contrib.staticfiles.storage import staticfiles_storage
+
+    try:
+        # Get the favicon file from static files
+        favicon_path = staticfiles_storage.path("assets/images/favicon.ico")
+
+        # Read the file content
+        with open(favicon_path, "rb") as f:
+            favicon_data = f.read()
+
+        # Return the favicon with appropriate headers
+        response = HttpResponse(favicon_data, content_type="image/x-icon")
+        response["Cache-Control"] = "public, max-age=31536000"  # Cache for 1 year
+        return response
+
+    except (FileNotFoundError, OSError):
+        # Fallback: return 404 if favicon not found
+        return HttpResponse(status=404)
 
 
 # Sitemap configuration
@@ -47,6 +74,7 @@ urlpatterns = [
         "admin/", admin.site.urls
     ),  # Keep admin with trailing slash (Django convention)
     path("", include("news.urls")),  # Include news app URLs at root
+    path("favicon.ico", favicon_view, name="favicon"),  # Serve favicon.ico at root
     path("keybase.txt", KeybaseTxtView.as_view(), name="keybase_txt"),
     path("robots.txt", RobotsTxtView.as_view(), name="robots_txt"),
     path(
