@@ -30,9 +30,9 @@
                 <div class="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 transition-all duration-300 hover:bg-slate-700/50 hover:shadow-xl h-full">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-heading group-hover:text-accent-primary transition-colors duration-200 mb-2">
+                            <h2 class="text-lg font-semibold text-heading group-hover:text-accent-primary transition-colors duration-200 mb-2">
                                 {{ tag_data.tag.name }}
-                            </h3>
+                            </h2>
                             <div class="flex items-center gap-4 text-sm text-meta">
                                 <span>{{ tag_data.article_count }} article{{ tag_data.article_count|pluralize }}</span>
                             </div>
@@ -54,7 +54,7 @@
                 <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
             </svg>
         </div>
-        <h3 class="text-xl font-bold text-heading mb-2">No Tags Found</h3>
+        <h2 class="text-xl font-bold text-heading mb-2">No Tags Found</h2>
         <p class="text-meta mb-6">Tags haven't been set up yet.</p>
         <a href="{% url 'news:list' %}" class="inline-flex items-center gap-2 btn-primary">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

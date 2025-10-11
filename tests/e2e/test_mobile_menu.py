@@ -97,7 +97,9 @@ def test_mobile_menu_navigation_works(page: Page) -> None:
     # Verify menu contains expected navigation links
     # Check that the links exist in the DOM (they may not be visible due to Tailwind responsive classes in test environment)
     mobile_menu = page.locator("#mobile-menu")
-    expect(mobile_menu.locator("a[href*='/']")).to_have_count(3)  # Latest News, Tags, Search
+    expect(mobile_menu.locator("a[href*='/']")).to_have_count(
+        3
+    )  # Latest News, Tags, Search
 
 
 @pytest.mark.mobile

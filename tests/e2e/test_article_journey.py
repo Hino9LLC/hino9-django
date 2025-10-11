@@ -30,7 +30,7 @@ def test_homepage_to_article_and_back(page: Page) -> None:
 
     # Get first article link
     first_article = page.locator("article").first
-    article_title = first_article.locator("h3").inner_text()
+    article_title = first_article.locator("h2").inner_text()
 
     # Click on first article
     first_article.locator("a").first.click()

@@ -40,8 +40,8 @@ def test_basic_search_flow(page: Page) -> None:
     # Verify on search results page (type defaults to hybrid but isn't in URL if not explicitly selected)
     assert "/search" in page.url
     assert "q=technology" in page.url
-    # Use more specific selector - first h3 in the results header section
-    expect(page.locator("h3").first).to_contain_text('Search Results for "technology"')
+    # Use more specific selector - first h2 in the results header section
+    expect(page.locator("h2").first).to_contain_text('Search Results for "technology"')
 
     # Verify query preserved in search box
     expect(page.locator("input[name='q']")).to_have_value("technology")
@@ -214,8 +214,8 @@ def test_search_performance(page: Page) -> None:
     # Submit search
     page.locator("button[type='submit']").filter(has_text="Search").click()
 
-    # Wait for results to load (check for search results header - use first h3)
-    expect(page.locator("h3").first).to_contain_text(
+    # Wait for results to load (check for search results header - use first h2)
+    expect(page.locator("h2").first).to_contain_text(
         'Search Results for "artificial intelligence"', timeout=2000
     )
 
@@ -253,8 +253,8 @@ def test_search_on_mobile(mobile_page: Page) -> None:
     assert "/search" in mobile_page.url
     assert "q=news" in mobile_page.url
 
-    # Verify results display on mobile (use first h3 for results header)
-    expect(mobile_page.locator("h3").first).to_contain_text('Search Results for "news"')
+    # Verify results display on mobile (use first h2 for results header)
+    expect(mobile_page.locator("h2").first).to_contain_text('Search Results for "news"')
 
     # Verify search type selector is accessible (radio buttons exist, though hidden with sr-only)
     expect(mobile_page.locator("input[type='radio'][value='hybrid']")).to_be_attached()

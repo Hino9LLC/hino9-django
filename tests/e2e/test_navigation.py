@@ -28,11 +28,11 @@ def test_tag_browsing_journey(page: Page) -> None:
     # Verify tags index loaded
     expect(page.locator("h1")).to_contain_text("Browse Tags")
 
-    # Click on first tag (extract tag name from h3, not the whole card)
+    # Click on first tag (extract tag name from h2, not the whole card)
     first_tag_link = page.locator("a[href*='/tag/']").first
     if first_tag_link.is_visible():
-        # Get tag name from the h3 element, not the whole card
-        tag_name = first_tag_link.locator("h3").inner_text()
+        # Get tag name from the h2 element, not the whole card
+        tag_name = first_tag_link.locator("h2").inner_text()
         first_tag_link.click()
 
         # Verify on tag detail page (URL includes tag slug and query params)

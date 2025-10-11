@@ -28,11 +28,11 @@
                             {% endif %}
 
                             <div class="md:col-span-2 md:order-1">
-                            <h3 class="text-xl font-bold mb-3">
+                            <h2 class="text-xl font-bold mb-3">
                                 <a href="{% url 'news:detail' article.id article.slug %}" class="link-title">
                                     {{ article.display_title }}
                                 </a>
-                            </h3>
+                            </h2>
 
                             <!-- Article Meta -->
                             <div class="flex flex-wrap items-center gap-4 text-sm text-meta mb-4">
@@ -116,7 +116,7 @@
                     <path d="M15 7h1a2 2 0 012 2v5.5a1.5 1.5 0 01-3 0V9a1 1 0 00-1-1h-1v-1z"></path>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-2">No News Articles Found</h3>
+            <h2 class="text-xl font-bold text-heading mb-2">No News Articles Found</h2>
             <p class="text-meta">There are currently no news articles in the database.</p>
         </div>
     {% endif %}

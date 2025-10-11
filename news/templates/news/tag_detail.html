@@ -57,11 +57,11 @@
                         {% endif %}
 
                         <div class="md:col-span-2 md:order-1">
-                            <h3 class="text-xl font-bold mb-3">
+                            <h2 class="text-xl font-bold mb-3">
                                 <a href="{% url 'news:detail' article.id article.slug %}" class="link-title">
                                     {{ article.display_title }}
                                 </a>
-                            </h3>
+                            </h2>
 
                             <!-- Article Meta -->
                             <div class="flex flex-wrap items-center gap-4 text-sm text-meta mb-4">
@@ -150,7 +150,7 @@
                     <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-heading mb-2">No Articles Found</h3>
+            <h2 class="text-xl font-bold text-heading mb-2">No Articles Found</h2>
             <p class="text-meta mb-6">There are no articles tagged with "{{ tag_name }}".</p>
             <a href="{% url 'news:list' %}" class="inline-flex items-center gap-2 btn-primary">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
