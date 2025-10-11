@@ -22,29 +22,6 @@
     }
   }
 
-  /**
-   * Sets up mobile menu toggle functionality
-   */
-  function setupMobileMenu() {
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    if (!mobileMenuButton || !mobileMenu) return;
-
-    // Toggle menu on button click
-    mobileMenuButton.addEventListener('click', function() {
-      mobileMenu.classList.toggle('hidden');
-    });
-
-    // Close mobile menu when clicking outside
-    document.addEventListener('click', function(event) {
-      if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
-        mobileMenu.classList.add('hidden');
-      }
-    });
-  }
-
-
   // Prevent browser's automatic scroll restoration
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
@@ -53,8 +30,6 @@
   // Fast initialization - check immediately for highlights
   function simpleInit() {
     if (document.querySelector('[data-page-type="listing"]')) {
-      setupMobileMenu();
-
       // Check for highlights right away - no delay
       setTimeout(function() {
         checkArticleHighlightData();
@@ -136,9 +111,5 @@
       }, 1500);
     }, 500);
   }
-
-// Optional: Expose utilities for manual calls if needed
-window.NewsApp = window.NewsApp || {};
-window.NewsApp.setupMobileMenu = setupMobileMenu;
 
 })();

@@ -38,6 +38,10 @@
 
     {% tailwind_css %}
 
+    <!-- Resource hints for external domains -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+
     <!-- Google Analytics -->
     {% if not debug and GOOGLE_ANALYTICS_ID %}
     <!-- Google tag (gtag.js) -->
@@ -82,7 +86,7 @@
 
                 <div class="flex items-center">
                     <div class="md:hidden">
-                        <button id="mobile-menu-button" class="p-2 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200">
+                        <button id="mobile-menu-button" aria-label="Toggle navigation menu" class="p-2 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 transition-all duration-200 cursor-pointer">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                             </svg>
@@ -130,7 +134,44 @@
         </div>
     </footer>
 
-    <!-- Common JavaScript -->
-    <script src="{% static 'js/common.js' %}"></script>
+    <!-- Mobile menu toggle (inline for instant interactivity) -->
+    <script>
+    (function(){
+        'use strict';
+
+        function initMobileMenu() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (!mobileMenuButton || !mobileMenu) {
+                return;
+            }
+
+            // Toggle menu on button click
+            mobileMenuButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Initialize when DOM is ready - multiple approaches for reliability
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMobileMenu);
+        } else {
+            // DOM already loaded, run immediately
+            initMobileMenu();
+        }
+    })();
+    </script>
+
+    <!-- Article highlighting (only on listing pages) -->
+    {% block page_scripts %}{% endblock %}
 </body>
 </html>
