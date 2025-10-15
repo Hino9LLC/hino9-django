@@ -548,41 +548,60 @@ class TagViewsTests(TestCase):
         self.tag1 = Tag.objects.create(name="Python", slug="python")
         self.tag2 = Tag.objects.create(name="JavaScript", slug="javascript")
 
-    @patch("news.models.Tag.get_news_count")
-    def test_tags_index_returns_200(self, mock_get_news_count: MagicMock) -> None:
+    def test_tags_index_returns_200(self) -> None:
         """Test that tags index returns HTTP 200."""
-        mock_get_news_count.return_value = 3
+        # Create some news articles so tags have counts
+        for i in range(3):
+            News.objects.create(
+                title=f"Python Article {i}",
+                llm_tags=["Python"],
+                status="published",
+            )
         response = self.client.get(reverse("news:tags_index"))
         self.assertEqual(response.status_code, 200)
 
-    @patch("news.models.Tag.get_news_count")
-    def test_tags_index_uses_correct_template(
-        self, mock_get_news_count: MagicMock
-    ) -> None:
+    def test_tags_index_uses_correct_template(self) -> None:
         """Test that tags index uses correct template."""
-        mock_get_news_count.return_value = 3
+        # Create some news articles so tags have counts
+        for i in range(3):
+            News.objects.create(
+                title=f"Python Article {i}",
+                llm_tags=["Python"],
+                status="published",
+            )
         response = self.client.get(reverse("news:tags_index"))
         self.assertTemplateUsed(response, "news/tags_index.html")
 
-    @patch("news.models.Tag.get_news_count")
-    def test_tags_index_context_contains_tags(
-        self, mock_get_news_count: MagicMock
-    ) -> None:
+    def test_tags_index_context_contains_tags(self) -> None:
         """Test that tags index context contains tags list."""
-        mock_get_news_count.return_value = 3
+        # Create some news articles so tags have counts
+        for i in range(3):
+            News.objects.create(
+                title=f"Python Article {i}",
+                llm_tags=["Python"],
+                status="published",
+            )
         response = self.client.get(reverse("news:tags_index"))
         self.assertIn("tags", response.context)
 
-    @patch.object(Tag, "get_news_count")
-    def test_tags_index_only_shows_tags_with_more_than_2_articles(
-        self, mock_get_news_count: MagicMock
-    ) -> None:
+    def test_tags_index_only_shows_tags_with_more_than_2_articles(self) -> None:
         """Test that tags index only shows tags with >2 articles."""
 
-        # Use return different values for each tag
-        # Tags are ordered alphabetically: JavaScript, then Python
-        # JavaScript should return 2, Python should return 3
-        mock_get_news_count.side_effect = [2, 3]
+        # JavaScript: 2 articles (should be filtered out)
+        for i in range(2):
+            News.objects.create(
+                title=f"JS Article {i}",
+                llm_tags=["JavaScript"],
+                status="published",
+            )
+
+        # Python: 3 articles (should appear)
+        for i in range(3):
+            News.objects.create(
+                title=f"Python Article {i}",
+                llm_tags=["Python"],
+                status="published",
+            )
 
         response = self.client.get(reverse("news:tags_index"))
         tags = response.context["tags"]
@@ -590,13 +609,19 @@ class TagViewsTests(TestCase):
         self.assertEqual(len(tags), 1)
         self.assertEqual(tags[0]["tag"].name, "Python")
 
-    @patch("news.models.Tag.get_news_count")
-    def test_tags_ordered_alphabetically(self, mock_get_news_count: MagicMock) -> None:
+    def test_tags_ordered_alphabetically(self) -> None:
         """Test that tags are ordered alphabetically by name."""
         Tag.objects.create(name="Zebra", slug="zebra")
         Tag.objects.create(name="Apple", slug="apple")
 
-        mock_get_news_count.return_value = 3
+        # Create news articles for all tags (>2 each so they appear)
+        for tag_name in ["Python", "JavaScript", "Zebra", "Apple"]:
+            for i in range(3):
+                News.objects.create(
+                    title=f"{tag_name} Article {i}",
+                    llm_tags=[tag_name],
+                    status="published",
+                )
 
         response = self.client.get(reverse("news:tags_index"))
         tags = response.context["tags"]

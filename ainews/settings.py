@@ -212,7 +212,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "theme" / "static_src",
+    BASE_DIR / "theme" / "static",
 ]
 
 # Tailwind settings
@@ -220,6 +220,14 @@ TAILWIND_APP_NAME = "theme"
 
 # WhiteNoise settings
 WHITENOISE_COMPRESS = True  # Enable Brotli/Gzip compression for static files
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Security settings for production (when behind Nginx proxy)
 if not DEBUG:

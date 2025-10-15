@@ -63,9 +63,16 @@ def test_pagination_context_preservation(page: Page) -> None:
     page.goto("/")
 
     # Click "Next" or "Page 2" if pagination exists
-    next_button = page.get_by_text("Next", exact=False)
+    # Use get_by_role to be more specific and avoid matching article text
+    next_button = page.get_by_role("link", name="Next")
 
-    if next_button.is_visible():
+    try:
+        next_button.wait_for(state="visible", timeout=1000)
+        is_visible = True
+    except Exception:
+        is_visible = False
+
+    if is_visible:
         next_button.click()
 
         # Verify on page 2

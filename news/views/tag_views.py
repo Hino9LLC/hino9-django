@@ -8,7 +8,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_control, cache_page
 
-from ..models import Tag
+from ..models import News, Tag
 
 
 @cache_page(settings.CACHE_TTL)
@@ -89,12 +89,23 @@ def tags_index(request: HttpRequest) -> HttpResponse:
     Returns:
         Rendered tags index template
     """
-    # Get all tags with their article counts
-    tags = Tag.objects.all().order_by("name")
+    # Get all published news articles with their tags in a single query
+    published_news = News.objects.filter(
+        status="published", deleted_at__isnull=True
+    ).values_list("llm_tags", flat=True)
 
+    # Count tag occurrences
+    tag_counts: dict[str, int] = {}
+    for tags_array in published_news:
+        if tags_array:  # Skip None/empty arrays
+            for tag_name in tags_array:
+                tag_counts[tag_name] = tag_counts.get(tag_name, 0) + 1
+
+    # Get all tags and attach their counts
+    tags = Tag.objects.all().order_by("name")
     tags_with_counts = []
     for tag in tags:
-        article_count = tag.get_news_count()
+        article_count = tag_counts.get(tag.name, 0)
         if article_count > 2:  # Only show tags with more than 2 articles
             tags_with_counts.append(
                 {

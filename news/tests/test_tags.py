@@ -136,31 +136,128 @@ class TagViewTests(TestCase):
 
     def test_tags_index_filters_tags_with_more_than_2_articles(self) -> None:
         """Test that tags index only shows tags with more than 2 articles."""
+        from news.models import News
 
-        # Mock get_news_count to return different counts for different tags
-        def mock_get_news_count(self: Tag) -> int:
-            count_map = {
-                "Machine Learning": 3,  # Should show (> 2)
-                "Artificial Intelligence": 2,  # Should be filtered (= 2)
-                "Deep Learning": 1,  # Should be filtered (< 2)
-                "Python": 0,  # Should be filtered (= 0)
-            }
-            return count_map.get(self.name, 0)
+        # Create News articles with different tag combinations
+        # Machine Learning: 3 articles (should show)
+        News.objects.create(
+            title="ML Article 1",
+            llm_tags=["Machine Learning"],
+            status="published",
+        )
+        News.objects.create(
+            title="ML Article 2",
+            llm_tags=["Machine Learning"],
+            status="published",
+        )
+        News.objects.create(
+            title="ML Article 3",
+            llm_tags=["Machine Learning"],
+            status="published",
+        )
 
-        # Patch the method on all Tag instances
-        with patch.object(Tag, "get_news_count", mock_get_news_count):
-            # Make request to tags_index view
-            response = self.client.get(reverse("news:tags_index"))
+        # Artificial Intelligence: 2 articles (should be filtered out)
+        News.objects.create(
+            title="AI Article 1",
+            llm_tags=["Artificial Intelligence"],
+            status="published",
+        )
+        News.objects.create(
+            title="AI Article 2",
+            llm_tags=["Artificial Intelligence"],
+            status="published",
+        )
 
-            # Assert response is successful
-            self.assertEqual(response.status_code, 200)
+        # Deep Learning: 1 article (should be filtered out)
+        News.objects.create(
+            title="DL Article 1",
+            llm_tags=["Deep Learning"],
+            status="published",
+        )
 
-            # Assert context has tags
-            self.assertIn("tags", response.context)
-            tags_in_context = response.context["tags"]
+        # Python: 0 articles (should be filtered out)
+        # JavaScript: 0 articles (should be filtered out)
 
-            # Should only have Machine Learning tag (3 articles > 2)
-            # AI, Deep Learning, and Python should be filtered out
-            self.assertEqual(len(tags_in_context), 1)
-            self.assertEqual(tags_in_context[0]["tag"].name, "Machine Learning")
-            self.assertEqual(tags_in_context[0]["article_count"], 3)
+        # Make request to tags_index view
+        response = self.client.get(reverse("news:tags_index"))
+
+        # Assert response is successful
+        self.assertEqual(response.status_code, 200)
+
+        # Assert context has tags
+        self.assertIn("tags", response.context)
+        tags_in_context = response.context["tags"]
+
+        # Should only have Machine Learning tag (3 articles > 2)
+        # AI, Deep Learning, Python, and JavaScript should be filtered out
+        self.assertEqual(len(tags_in_context), 1)
+        self.assertEqual(tags_in_context[0]["tag"].name, "Machine Learning")
+        self.assertEqual(tags_in_context[0]["article_count"], 3)
+
+    def test_tags_index_boundary_filtering(self) -> None:
+        """Test boundary condition: tags with exactly 2 articles should not show, 3+ should show."""
+        from news.models import News
+
+        # Create tags for testing boundary conditions
+        Tag.objects.create(name="Zero Articles", slug="zero-articles")
+        Tag.objects.create(name="One Article", slug="one-article")
+        Tag.objects.create(name="Two Articles", slug="two-articles")
+        Tag.objects.create(name="Three Articles", slug="three-articles")
+        Tag.objects.create(name="Four Articles", slug="four-articles")
+
+        # Create 0 articles for "Zero Articles" tag (should not show)
+
+        # Create 1 article for "One Article" tag (should not show)
+        News.objects.create(
+            title="Article for One",
+            llm_tags=["One Article"],
+            status="published",
+        )
+
+        # Create 2 articles for "Two Articles" tag (should not show - boundary)
+        for i in range(2):
+            News.objects.create(
+                title=f"Article for Two {i}",
+                llm_tags=["Two Articles"],
+                status="published",
+            )
+
+        # Create 3 articles for "Three Articles" tag (should show - boundary)
+        for i in range(3):
+            News.objects.create(
+                title=f"Article for Three {i}",
+                llm_tags=["Three Articles"],
+                status="published",
+            )
+
+        # Create 4 articles for "Four Articles" tag (should show)
+        for i in range(4):
+            News.objects.create(
+                title=f"Article for Four {i}",
+                llm_tags=["Four Articles"],
+                status="published",
+            )
+
+        # Make request to tags_index view
+        response = self.client.get(reverse("news:tags_index"))
+        tags_in_context = response.context["tags"]
+
+        # Extract tag names that are shown
+        shown_tag_names = [t["tag"].name for t in tags_in_context]
+
+        # Assert that only tags with 3+ articles are shown
+        self.assertIn("Three Articles", shown_tag_names)
+        self.assertIn("Four Articles", shown_tag_names)
+
+        # Assert that tags with 0, 1, or 2 articles are NOT shown
+        self.assertNotIn("Zero Articles", shown_tag_names)
+        self.assertNotIn("One Article", shown_tag_names)
+        self.assertNotIn("Two Articles", shown_tag_names)
+
+        # Verify exact counts
+        self.assertEqual(len(tags_in_context), 2)
+
+        # Verify the article counts are correct
+        tag_counts = {t["tag"].name: t["article_count"] for t in tags_in_context}
+        self.assertEqual(tag_counts["Three Articles"], 3)
+        self.assertEqual(tag_counts["Four Articles"], 4)
